@@ -5,8 +5,9 @@ import '../core/constants/app_colors.dart';
 import 'custom_text.dart';
 
 class CustomButton extends StatelessWidget {
-  const CustomButton({super.key, required this.text, required this.onTap});
+  const CustomButton({super.key, required this.text, required this.onTap, this.width});
   final String text ;
+  final double? width ;
   final  Function() onTap ;
 
   @override
@@ -15,10 +16,10 @@ class CustomButton extends StatelessWidget {
       onTap: onTap,
       child: Container(
         height: 60,
-        width: 190,
+        width: width ?? 190 ,
         decoration: BoxDecoration(
           color: AppColors.primaryColor,
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(18),
         ),
         child: Center(
           child: CustomText(
