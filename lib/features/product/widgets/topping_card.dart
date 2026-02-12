@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:gap/gap.dart';
 
 class ToppingCard extends StatelessWidget {
   const ToppingCard({super.key, required this.imageurl, required this.name, required this.onAdd, this.color, });
@@ -22,23 +24,24 @@ class ToppingCard extends StatelessWidget {
             ),
             child: Image.asset(
              imageurl,
-              height: 88,
-              width: 80,
+              height: 80.h,
+              width: 75,
               fit: BoxFit.contain,
             ),
           ),
           Container(
-            padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
+            padding: const EdgeInsets.all(8),
+            decoration:  BoxDecoration(
               color: Color(0xFF3A2F2F),
               borderRadius: BorderRadius.vertical(
-                bottom: Radius.circular(20),
+                bottom: Radius.circular(25.r),
 
               ),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Gap(2),
                  Text(
                   name,
                   style: TextStyle(

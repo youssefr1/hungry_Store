@@ -5,6 +5,8 @@ import 'package:hungry_store/features/checkout/views/checkout_view.dart';
 import 'package:hungry_store/shared/custom_button.dart';
 import 'package:hungry_store/shared/custom_text.dart';
 
+import '../../../core/constants/app_colors.dart';
+
 class CartView extends StatefulWidget {
   const CartView({super.key});
 
@@ -14,7 +16,7 @@ class CartView extends StatefulWidget {
 
 class _CartViewState extends State<CartView> {
    late List<int>  quantities ;
-   int itemCount = 5 ;
+   int itemCount = 3 ;
    @override
   void initState() {
     quantities = List.generate(5, (_)=>1);
@@ -36,43 +38,57 @@ class _CartViewState extends State<CartView> {
     return Scaffold(
       appBar: AppBar(toolbarHeight: 0,scrolledUnderElevation: 0,backgroundColor: Colors.white,),
       bottomSheet: Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-            borderRadius: BorderRadius.only(topLeft: Radius.circular(30),topRight: Radius.circular(30))
-        ),
-        padding: const EdgeInsets.all(20),
-        height: 100,
-        width: double.infinity,
-        child:
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                CustomText(
-                  text: 'Total',
-                  weight: FontWeight.bold,
-                  size: 16,
-                ),
-                Gap(5),
-                CustomText(
-                  text: '18.19 \$',
-                  size: 24,
-                  weight: FontWeight.w600,
-                ),
-              ],
-            ),
-            CustomButton(
-              text: 'Checkout',
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context){
-                  return CheckoutView();
-                }));
-              },
+
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(topRight: Radius.circular(30),topLeft: Radius.circular(30)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey,
+              offset: Offset(0, 0),
+              blurRadius: 20,
             ),
           ],
+        ),
+
+        height: 110,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 25,
+          ),
+          child: Row(
+            mainAxisAlignment:
+            MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                crossAxisAlignment:
+                CrossAxisAlignment.start,
+                children: [
+                  CustomText(
+                    text: 'Total',
+                    weight: FontWeight.bold,
+                    size: 16,
+                  ),
+                  Gap(5),
+                  CustomText(
+                    text: '18.19 \$',
+                    size: 24,
+                    weight: FontWeight.w600,
+                  ),
+                ],
+              ),
+              CustomButton(
+                text: 'Checkout',
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context){
+                    return CheckoutView();
+                  }));
+                },
+              ),
+            ],
+          ),
         ),
       ),
       body: Padding(

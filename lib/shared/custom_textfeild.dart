@@ -39,7 +39,7 @@ class _CustomTextfeildState extends State<CustomTextfeild> {
         return null;
       } ,
       decoration: InputDecoration(
-        suffixIcon:widget.isPassword? GestureDetector(onTap:_togglePassword,child: Icon(Icons.remove_red_eye_rounded)):null,
+        suffixIcon:widget.isPassword? GestureDetector(onTap:_togglePassword,child: Icon(Icons.remove_red_eye_rounded,color: Colors.white,)):null,
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8.r),
           borderSide: BorderSide(color: Colors.white),
@@ -49,9 +49,12 @@ class _CustomTextfeildState extends State<CustomTextfeild> {
           borderSide: BorderSide(color: Colors.white),
         ),
         hintText: widget.hintText,
+        labelStyle: TextStyle(color: Colors.white),
+        hintStyle: TextStyle(color: Colors.black),
         helperStyle: TextStyle(color: Colors.white),
         fillColor: Colors.white,
         filled: true,
+
       ),
       obscureText: _obscureText,
 

@@ -12,9 +12,13 @@ class CustomText extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
      text,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      textScaler: TextScaler.noScaling,
       style: TextStyle(
         fontSize: size?.sp??18,
         color:color??Colors.black,
+
         fontWeight: weight ??FontWeight.normal ,
       ),
     );

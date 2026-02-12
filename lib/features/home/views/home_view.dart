@@ -34,7 +34,8 @@ class _HomeViewState extends State<HomeView> {
       child: Scaffold(
         body: CustomScrollView(
           slivers: [
-            SliverAppBar(elevation: 0,
+            SliverAppBar(
+              elevation: 0,
               backgroundColor: Colors.white,
               pinned: true,
               floating: false,
@@ -91,7 +92,7 @@ class _HomeViewState extends State<HomeView> {
                 gridDelegate:
                     SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      childAspectRatio: 0.6,
+                      childAspectRatio: 0.7,
                     ),
               ),
             ),
