@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:gap/gap.dart';
+import 'package:hungry_store/features/auth/data/auth_repo.dart';
 import 'package:hungry_store/features/auth/views/signup_view.dart';
 import 'package:hungry_store/root.dart';
 import 'package:hungry_store/shared/custom_text.dart';
 import 'package:hungry_store/shared/custom_textfeild.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/network/api_error.dart';
 import '../../../shared/custom_auth_button.dart';
 
 class LoginView extends StatefulWidget {
@@ -19,11 +21,55 @@ class LoginView extends StatefulWidget {
 
 class _LoginViewState extends State<LoginView> {
   TextEditingController emailController =
-  TextEditingController();
+      TextEditingController();
   TextEditingController passwordController =
-  TextEditingController();
+      TextEditingController();
   final GlobalKey<FormState> formKey =
-  GlobalKey<FormState>();
+      GlobalKey<FormState>();
+
+  AuthRepo authRepo = AuthRepo();
+  bool isLoading = false;
+
+
+  Future<void> login() async {
+    setState(() {
+      isLoading = true ;
+    });
+    if(formKey.currentState!.validate()){
+      try {
+        final user = await authRepo.login(
+          emailController.text.trim(),
+          passwordController.text.trim(),
+        );
+        if (user != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) {
+                return Root();
+              },
+            ),
+          );
+        }
+        setState(() {
+          isLoading = false ;
+        });
+      } catch (e) {
+        setState(() {
+          isLoading = false ;
+        });
+        String errorMessage = 'unhandled error in login';
+        if (e is ApiError) {
+          errorMessage = e.message;
+        }
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(errorMessage)));
+      }
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -38,7 +84,12 @@ class _LoginViewState extends State<LoginView> {
               child: Column(
                 children: [
                   Gap(200),
-                  SvgPicture.asset('assets/logo/logo.svg',color: AppColors.primaryColor,height: 60.h,width: 60.w,),
+                  SvgPicture.asset(
+                    'assets/logo/logo.svg',
+                    color: AppColors.primaryColor,
+                    height: 60.h,
+                    width: 60.w,
+                  ),
                   Gap(10),
                   CustomText(
                     text:
@@ -55,8 +106,8 @@ class _LoginViewState extends State<LoginView> {
                         color: AppColors.primaryColor,
                         borderRadius: BorderRadius.only(
                           topRight: Radius.circular(30),
-                          topLeft: Radius.circular(30),)
-        
+                          topLeft: Radius.circular(30),
+                        ),
                       ),
                       child: SingleChildScrollView(
                         child: Column(
@@ -71,42 +122,58 @@ class _LoginViewState extends State<LoginView> {
                             CustomTextfeild(
                               hintText: 'Password',
                               isPassword: true,
-                              controller: passwordController,
+                              controller:
+                                  passwordController,
                             ),
                             Gap(40),
+
+                            // Login Button
+                            isLoading?
+                            CircularProgressIndicator(color: Colors.white,):
                             CustomAuthButton(
                               color: Colors.transparent,
                               textColor: Colors.white,
-                              onTap: () {
-                                if (formKey.currentState!
-                                    .validate()) {
-                                  print('valid');
-                                }
-                                return;
-                              },
+                              onTap: login,
                               text: 'Login',
                             ),
                             Gap(20),
                             CustomAuthButton(
                               color: Colors.white,
                               onTap: () {
-                                Navigator.push(context, MaterialPageRoute(builder: (context){
-                                  return SignupView();
-                                }));
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return SignupView();
+                                    },
+                                  ),
+                                );
                               },
                               text: 'Create Account ?',
                             ),
                             Gap(5),
-                            TextButton(onPressed: (){
-                              Navigator.push(context, MaterialPageRoute(builder: (context){
-                                return Root();
-                              }));
-                            }, child: CustomText(text: 'Continue as guest ? ',color: Colors.white,))
+                            TextButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) {
+                                      return Root();
+                                    },
+                                  ),
+                                );
+                              },
+                              child: CustomText(
+                                text:
+                                    'Continue as guest ? ',
+                                color: Colors.white,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),

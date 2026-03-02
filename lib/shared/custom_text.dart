@@ -18,7 +18,6 @@ class CustomText extends StatelessWidget {
       style: TextStyle(
         fontSize: size?.sp??18,
         color:color??Colors.black,
-
         fontWeight: weight ??FontWeight.normal ,
       ),
     );
