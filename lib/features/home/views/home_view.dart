@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -46,10 +47,10 @@ class _HomeViewState extends State<HomeView> {
                 padding: const EdgeInsets.only(top: 30,right: 20,left: 20),
                 child: Column(
                   children: [
-                    UserHeader(),
+                    FadeInDown(duration: Duration(milliseconds: 500), child: UserHeader()),
                     // Search bar
                     Gap(20),
-                    SerachBar(),
+                    FadeInDown(duration: Duration(milliseconds: 600), child: SerachBar()),
 
 
                   ],
@@ -60,7 +61,9 @@ class _HomeViewState extends State<HomeView> {
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16,vertical: 5),
-                child: FoodCategory(selectedIndex: selectedIndex, category: category)
+                child: FadeInRight(
+                    duration: Duration(milliseconds: 700),
+                    child: FoodCategory(selectedIndex: selectedIndex, category: category)),
 
                     // Product GridView Items
                   
@@ -74,17 +77,20 @@ class _HomeViewState extends State<HomeView> {
                 delegate: SliverChildBuilderDelegate(
                   childCount: 6,
                   (context, index) {
-                    return GestureDetector( 
-                      onTap: (){
-                        Navigator.push(context, MaterialPageRoute(builder: (c){
-                          return ProductDetailsView();
-                        }));
-                      },
-                      child: CartItem(
-                        image: 'assets/logo/image 6.png',
-                        text: 'Chess Burger',
-                        desc: 'Wendy\'s Burger',
-                        rate: '4.9',
+                    return FadeInUp(
+                      duration: Duration(milliseconds: 800 + (index * 100)),
+                      child: GestureDetector( 
+                        onTap: (){
+                          Navigator.push(context, MaterialPageRoute(builder: (c){
+                            return ProductDetailsView();
+                          }));
+                        },
+                        child: CartItem(
+                          image: 'assets/logo/image 6.png',
+                          text: 'Chess Burger',
+                          desc: 'Wendy\'s Burger',
+                          rate: '4.9',
+                        ),
                       ),
                     );
                   },

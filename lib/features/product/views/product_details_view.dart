@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
@@ -40,24 +41,32 @@ class _ProductDetailsViewState
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SpicySlider(
-                  value: value,
-                  onChanged: (double value) {
-                    setState(() {
-                      this.value = value;
-                    });
-                  },
+                FadeInDown(
+                  duration: Duration(milliseconds: 400),
+                  child: SpicySlider(
+                    value: value,
+                    onChanged: (double value) {
+                      setState(() {
+                        this.value = value;
+                      });
+                    },
+                  ),
                 ),
                 Gap(50),
-                CustomText(
-                  text: 'Toppings',
-                  size: 20,
-                  weight: FontWeight.w600,
+                FadeInDown(
+                  duration: Duration(milliseconds: 500),
+                  child: CustomText(
+                    text: 'Toppings',
+                    size: 20,
+                    weight: FontWeight.w600,
+                  ),
                 ),
                 Gap(30),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  clipBehavior: Clip.none,
+                FadeInRight(
+                  duration: Duration(milliseconds: 600),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    clipBehavior: Clip.none,
                   child: Row(
                     children: List.generate(4, (index) {
                       return Padding(
@@ -74,16 +83,22 @@ class _ProductDetailsViewState
                     }),
                   ),
                 ),
+                ),
                 Gap(20),
-                CustomText(
-                  text: 'Side options',
-                  size: 20,
-                  weight: FontWeight.w600,
+                FadeInUp(
+                  duration: Duration(milliseconds: 700),
+                  child: CustomText(
+                    text: 'Side options',
+                    size: 20,
+                    weight: FontWeight.w600,
+                  ),
                 ),
                 Gap(30),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  clipBehavior: Clip.none,
+                FadeInRight(
+                  duration: Duration(milliseconds: 800),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    clipBehavior: Clip.none,
                   child: Row(
                     children: List.generate(4, (index) {
                       return Padding(
@@ -101,25 +116,27 @@ class _ProductDetailsViewState
                     }),
                   ),
                 ),
-                Gap(50),
+                ),
+                Gap(100), // Added spacing for bottom sheet
               ],
             ),
           ),
         ),
       ),
-      bottomSheet:
-      Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(30),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey,
-              offset: Offset(0, 0),
-              blurRadius: 10,
-            ),
-          ],
-        ),
+      bottomSheet: FadeInUp(
+        duration: Duration(milliseconds: 600),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(30),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey,
+                offset: Offset(0, 0),
+                blurRadius: 10,
+              ),
+            ],
+          ),
 
         height: 110,
         child: Padding(
@@ -162,6 +179,6 @@ class _ProductDetailsViewState
           ),
         ),
       ),
-    );
+    ));
   }
 }

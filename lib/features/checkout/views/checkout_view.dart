@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_store/core/constants/app_colors.dart';
@@ -38,125 +39,145 @@ class _CheckoutViewState extends State<CheckoutView> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CustomText(
-                text: 'Order summary',
-                size: 25,
-                weight: FontWeight.bold,
+              FadeInDown(
+                duration: Duration(milliseconds: 400),
+                child: CustomText(
+                  text: 'Order summary',
+                  size: 25,
+                  weight: FontWeight.bold,
+                ),
               ),
               Gap(10),
-              OrderDetails(
-                order: '18.8',
-                taxes: '1',
-                delivery: '2',
-                total: '20',
+              FadeInDown(
+                duration: Duration(milliseconds: 500),
+                child: OrderDetails(
+                  order: '18.8',
+                  taxes: '1',
+                  delivery: '2',
+                  total: '20',
+                ),
               ),
               Gap(80),
-              CustomText(
-                text: 'Payment methods',
-                size: 25,
-                weight: FontWeight.bold,
+              FadeInDown(
+                duration: Duration(milliseconds: 600),
+                child: CustomText(
+                  text: 'Payment methods',
+                  size: 25,
+                  weight: FontWeight.bold,
+                ),
               ),
               Gap(20),
 
               /// Cash
-              ListTile(
-                onTap: () {
-                  setState(() {
-                    selectedMethod = 'Cash';
-                  });
-                },
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                tileColor: Color(0xff3C2F2F),
-                textColor: Colors.white,
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 5,
-                ),
-                title: Text(
-                  'Cash on Delivery',
-                  style: TextStyle(fontSize: 17),
-                ),
-                leading: Image.asset(
-                  'assets/icons/dollar Background Removed 1.png',
-                ),
-                trailing: Radio<String>(
-                  activeColor: Colors.white,
-                  value: 'Cash',
-                  groupValue: selectedMethod,
-                  onChanged: (c) {
+              FadeInUp(
+                duration: Duration(milliseconds: 700),
+                child: ListTile(
+                  onTap: () {
                     setState(() {
-                      selectedMethod = c!;
+                      selectedMethod = 'Cash';
                     });
                   },
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  tileColor: Color(0xff3C2F2F),
+                  textColor: Colors.white,
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 5,
+                  ),
+                  title: Text(
+                    'Cash on Delivery',
+                    style: TextStyle(fontSize: 17),
+                  ),
+                  leading: Image.asset(
+                    'assets/icons/dollar Background Removed 1.png',
+                  ),
+                  trailing: Radio<String>(
+                    activeColor: Colors.white,
+                    value: 'Cash',
+                    groupValue: selectedMethod,
+                    onChanged: (c) {
+                      setState(() {
+                        selectedMethod = c!;
+                      });
+                    },
+                  ),
                 ),
               ),
 
               Gap(20),
               // Debit card
-              ListTile(
-                onTap: () {
-                  setState(() {
-                    selectedMethod = 'Visa';
-                  });
-                },
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                tileColor: Colors.blue.shade900,
-                textColor: Colors.white,
-                subtitle: Text(
-                  '3685 **** **** 5455',
-                  style: TextStyle(
-                    color: Colors.grey.shade500,
-                  ),
-                ),
-                contentPadding: EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                title: Text(
-                  'Debit card',
-                  style: TextStyle(fontSize: 17),
-                ),
-                leading: Image.asset(
-                  'assets/icons/image 13.png',
-                  width: 83,
-                  color: Colors.white,
-                ),
-                trailing: Radio<String>(
-                  activeColor: Colors.white,
-                  value: 'Visa',
-                  groupValue: selectedMethod,
-                  onChanged: (c) {
+              FadeInUp(
+                duration: Duration(milliseconds: 800),
+                child: ListTile(
+                  onTap: () {
                     setState(() {
-                      selectedMethod = c!;
+                      selectedMethod = 'Visa';
                     });
                   },
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  tileColor: Colors.blue.shade900,
+                  textColor: Colors.white,
+                  subtitle: Text(
+                    '3685 **** **** 5455',
+                    style: TextStyle(
+                      color: Colors.grey.shade500,
+                    ),
+                  ),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  title: Text(
+                    'Debit card',
+                    style: TextStyle(fontSize: 17),
+                  ),
+                  leading: Image.asset(
+                    'assets/icons/image 13.png',
+                    width: 83,
+                    color: Colors.white,
+                  ),
+                  trailing: Radio<String>(
+                    activeColor: Colors.white,
+                    value: 'Visa',
+                    groupValue: selectedMethod,
+                    onChanged: (c) {
+                      setState(() {
+                        selectedMethod = c!;
+                      });
+                    },
+                  ),
                 ),
               ),
               Gap(5),
-              Row(
-                children: [
-                  Checkbox(
-                    activeColor: Color(0xffEF2A39),
-                    value: true,
-                    onChanged: (v) {},
-                  ),
-                  CustomText(
-                    text:
-                        'Save card details for future payments',
-                    size: 15,
-                  ),
-                ],
+              FadeInUp(
+                duration: Duration(milliseconds: 900),
+                child: Row(
+                  children: [
+                    Checkbox(
+                      activeColor: Color(0xffEF2A39),
+                      value: true,
+                      onChanged: (v) {},
+                    ),
+                    CustomText(
+                      text:
+                          'Save card details for future payments',
+                      size: 15,
+                    ),
+                  ],
+                ),
               ),
-              Gap(15),
+              Gap(100), // Added gap for bottomsheet
             ],
           ),
         ),
       ),
-      bottomSheet: Container(
+      bottomSheet: FadeInUp(
+        duration: Duration(milliseconds: 600),
+        child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(30),
@@ -258,6 +279,7 @@ class _CheckoutViewState extends State<CheckoutView> {
             ],
           ),
         ),
+      ),
       ),
     );
   }

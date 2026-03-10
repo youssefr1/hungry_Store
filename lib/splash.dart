@@ -6,6 +6,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hungry_store/core/constants/app_colors.dart';
 import 'package:hungry_store/features/auth/views/login_view.dart';
 import 'package:hungry_store/root.dart';
+import 'package:hungry_store/shared/custom_loading_indicator.dart';
 
 class SplashView extends StatefulWidget {
   const SplashView({super.key});
@@ -18,7 +19,6 @@ class _SplashViewState extends State<SplashView>
     with TickerProviderStateMixin {
 
   late AnimationController _logoController;
-  late AnimationController _loadingController;
 
   late Animation<double> _fade;
   late Animation<double> _scale;
@@ -32,11 +32,6 @@ class _SplashViewState extends State<SplashView>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
-
-    _loadingController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat();
 
     _fade = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _logoController, curve: Curves.easeIn),
@@ -66,7 +61,6 @@ class _SplashViewState extends State<SplashView>
   @override
   void dispose() {
     _logoController.dispose();
-    _loadingController.dispose();
     super.dispose();
   }
 
@@ -94,35 +88,7 @@ class _SplashViewState extends State<SplashView>
           SizedBox(height: 20.h),
 
           /// LOADING INDICATOR (Custom)
-          SizedBox(
-            height: 24.h,
-            child: AnimatedBuilder(
-              animation: _loadingController,
-              builder: (context, _) {
-                return Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(3, (index) {
-                    final value =
-                        (_loadingController.value + index * 0.2) % 1.0;
-                    final scale = 0.6 + (value < 0.5 ? value : 1 - value);
-
-                    return Transform.scale(
-                      scale: scale,
-                      child: Container(
-                        margin: EdgeInsets.symmetric(horizontal: 6.w),
-                        width: 8.w,
-                        height: 8.w,
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                    );
-                  }),
-                );
-              },
-            ),
-          ),
+          CustomLoadingIndicator(color: Colors.white),
 
           const Spacer(),
 

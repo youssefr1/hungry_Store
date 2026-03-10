@@ -11,10 +11,7 @@ class AuthRepo {
 
   // login
 
-  Future<UserModel?> login(
-    String email,
-    String password,
-  ) async {
+  Future<UserModel?> login(String email, String password,) async {
     try {
       final response = await apiServices.post('/login', {
         'email': email,
@@ -48,19 +45,36 @@ class AuthRepo {
     }
   }
 
+
   // signup
-  Future<UserModel?> signUp(
-    String name,
-    String email,
-    String password,
-  ) async {
+  Future<UserModel?> signUp(String name, String email, String password,) async {
     try {
-      final response = await apiServices.post('/signup', {
+      final response = await apiServices.post('/register', {
         'name': name,
         'email': email,
         'password': password,
       });
-      return response;
+      if (response is ApiError) {
+        throw response;
+      }
+
+      if (response is Map<String, dynamic>) {
+        final msg = response['message'];
+        final code = response['code'];
+        final data = response['data'];
+        if(code != 200 ||data ==null){
+          throw ApiError(message: msg);
+        }
+        final user = UserModel.fromJson(response['data']);
+        if (user.token != null) {
+          await PrefHelper.saveToken(user.token!);
+        }
+        return user;
+      }else{
+        throw ApiError(message: 'UnExpected Error From Server');
+      }
+
+
     } on DioException catch (e) {
       throw ApiExceptions.handleApiError(e);
     } catch (e) {

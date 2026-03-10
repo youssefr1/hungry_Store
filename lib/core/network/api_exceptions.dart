@@ -18,7 +18,7 @@ if(data is Map<String,dynamic> && data.containsKey('message')){
       case DioExceptionType.receiveTimeout:
        return ApiError( message: 'Receive Timeout');
       default:
-        return ApiError( message: 'Something went wrong');
+        return ApiError( message: 'An unexpected error occurred please try again ');
 
 
     }

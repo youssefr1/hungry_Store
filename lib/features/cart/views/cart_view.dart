@@ -1,3 +1,4 @@
+import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_store/features/cart/widgets/cart_item.dart';
@@ -37,23 +38,23 @@ class _CartViewState extends State<CartView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(toolbarHeight: 0,scrolledUnderElevation: 0,backgroundColor: Colors.white,),
-      bottomSheet: Container(
-
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(topRight: Radius.circular(30),topLeft: Radius.circular(30)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey,
-              offset: Offset(0, 0),
-              blurRadius: 20,
-            ),
-          ],
-        ),
-
-        height: 110,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
+      bottomSheet: FadeInUp(
+        duration: Duration(milliseconds: 500),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(topRight: Radius.circular(30),topLeft: Radius.circular(30)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey,
+                offset: Offset(0, 0),
+                blurRadius: 20,
+              ),
+            ],
+          ),
+          height: 110,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
             horizontal: 20,
             vertical: 25,
           ),
@@ -91,21 +92,24 @@ class _CartViewState extends State<CartView> {
           ),
         ),
       ),
+      ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15),
         child: ListView.builder(
           padding: const EdgeInsets.only(bottom: 100,top: 40), // مساحة للـ bottomSheet
           itemCount: itemCount,
           itemBuilder: (context, index) {
-            return  CartItem(
-              image: 'assets/logo/image 6.png',
-              text: 'Hamburger',
-              disc: 'Veggie Burger',
-              num: quantities[index],
-              onAdd:() => onAdd(index),
-              onMinus: () =>onMinus(index)
-              ,
-
+            return  FadeInLeft(
+              duration: Duration(milliseconds: 600 + (index * 100)),
+              child: CartItem(
+                image: 'assets/logo/image 6.png',
+                text: 'Hamburger',
+                disc: 'Veggie Burger',
+                num: quantities[index],
+                onAdd:() => onAdd(index),
+                onMinus: () =>onMinus(index)
+                ,
+              ),
             );
           },
         ),

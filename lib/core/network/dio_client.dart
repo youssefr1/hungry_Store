@@ -19,7 +19,6 @@ DioClient(){
           options.headers['Authorization'] = 'Bearer $token';
         }
         return handler.next(options);
-
       }
     )
   );
