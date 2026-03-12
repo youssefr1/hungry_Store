@@ -23,9 +23,9 @@ class AuthRepo {
 
       if (response is Map<String, dynamic>) {
         final msg = response['message'];
-        final code = response['code'];
+        final code = int.tryParse(response['code'].toString()) ?? -1;
         final data = response['data'];
-        if(code != 200 ||data ==null){
+        if(code != 200 || data == null){
           throw ApiError(message: msg);
         }
         final user = UserModel.fromJson(response['data']);
@@ -60,16 +60,20 @@ class AuthRepo {
 
       if (response is Map<String, dynamic>) {
         final msg = response['message'];
-        final code = response['code'];
+        final code = int.tryParse(response['code'].toString()) ?? -1;
         final data = response['data'];
-        if(code != 200 ||data ==null){
+        if (code != 200 && code != 201) {
           throw ApiError(message: msg);
         }
-        final user = UserModel.fromJson(response['data']);
-        if (user.token != null) {
-          await PrefHelper.saveToken(user.token!);
+        
+        UserModel? user;
+        if (data is Map<String, dynamic>) {
+          user = UserModel.fromJson(data);
+          if (user.token != null) {
+            await PrefHelper.saveToken(user.token!);
+          }
         }
-        return user;
+        return user ?? UserModel(name: name, email: email);
       }else{
         throw ApiError(message: 'UnExpected Error From Server');
       }

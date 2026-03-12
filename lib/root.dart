@@ -33,41 +33,44 @@ class _RootState extends State<Root> {
   @override
   Widget build(BuildContext context) {
 
-    return Scaffold(
-      bottomNavigationBar: FadeInUp(
-        duration: Duration(milliseconds: 500),
-        child: Container(
-          decoration: BoxDecoration(
-            color: AppColors.primaryColor,
-            borderRadius: BorderRadius.circular(18.r)
-          ),
-          padding: EdgeInsets.all(10),
-          child: BottomNavigationBar(
-            elevation: 0,
-            backgroundColor: Colors.transparent,
-              type: BottomNavigationBarType.fixed,
-              items:[
-                BottomNavigationBarItem(icon: Icon(Icons.home),label: 'Home'),
-                BottomNavigationBarItem(icon: Icon(Icons.add_shopping_cart),label: 'Cart'),
-                BottomNavigationBarItem(icon: Icon(Icons.local_dining_sharp),label: 'Order History'),
-                BottomNavigationBarItem(icon: Icon(Icons.person),label: 'Profile'),
-              ] ,
-            selectedItemColor: Colors.white,
-            unselectedItemColor: Colors.grey.shade500.withOpacity(0.7),
-            currentIndex: currentScreen,
-            onTap:(index){
-              setState(() {
-                currentScreen = index ;
-              });
-              pageController.jumpToPage(currentScreen);
-            } ,
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        bottomNavigationBar: FadeInUp(
+          duration: Duration(milliseconds: 500),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.primaryColor,
+              borderRadius: BorderRadius.circular(18.r)
+            ),
+            padding: EdgeInsets.all(10),
+            child: BottomNavigationBar(
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+                type: BottomNavigationBarType.fixed,
+                items:[
+                  BottomNavigationBarItem(icon: Icon(Icons.home),label: 'Home'),
+                  BottomNavigationBarItem(icon: Icon(Icons.add_shopping_cart),label: 'Cart'),
+                  BottomNavigationBarItem(icon: Icon(Icons.local_dining_sharp),label: 'Order History'),
+                  BottomNavigationBarItem(icon: Icon(Icons.person),label: 'Profile'),
+                ] ,
+              selectedItemColor: Colors.white,
+              unselectedItemColor: Colors.grey.shade500.withOpacity(0.7),
+              currentIndex: currentScreen,
+              onTap:(index){
+                setState(() {
+                  currentScreen = index ;
+                });
+                pageController.jumpToPage(currentScreen);
+              } ,
+            ),
           ),
         ),
-      ),
-      body: PageView(
-        physics:NeverScrollableScrollPhysics() ,
-        controller: pageController,
-        children: screens,
+        body: PageView(
+          physics:NeverScrollableScrollPhysics() ,
+          controller: pageController,
+          children: screens,
+        ),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_store/core/constants/app_colors.dart';
+import 'package:hungry_store/features/auth/views/login_view.dart';
 import 'package:hungry_store/shared/custom_text.dart';
 
 import '../widgets/custom_user_txtfeild.dart';
@@ -34,16 +35,7 @@ class _ProfileViewState extends State<ProfileView> {
       appBar: AppBar(
         scrolledUnderElevation: 0.0,
         backgroundColor: Colors.transparent,
-        leading: GestureDetector(
-          onTap: () {
-            Navigator.pop(context);
-          },
-          child: Icon(
-            Icons.arrow_back,
-            color: Colors.white,
-            weight: 20.w,
-          ),
-        ),
+
         actions: [
           FadeInDown(
             duration: Duration(milliseconds: 400),
@@ -153,9 +145,9 @@ class _ProfileViewState extends State<ProfileView> {
       bottomSheet: FadeInUp(
         duration: Duration(milliseconds: 1100),
         child: Container(
-          height: 70.h,
+          height: 100.h,
           decoration: BoxDecoration(
-            color: Colors.white,
+
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -170,9 +162,12 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                   child: Row(
                     children: [
-                      CustomText(
-                        text: 'Edit profile',
-                        color: Colors.white,
+                      GestureDetector(
+
+                        child: CustomText(
+                          text: 'Edit profile',
+                          color: Colors.white,
+                        ),
                       ),
                       Gap(10),
                       Icon(
@@ -191,9 +186,14 @@ class _ProfileViewState extends State<ProfileView> {
                   ),
                   child: Row(
                     children: [
-                      CustomText(
-                        text: 'Logout',
-                        color: AppColors.primaryColor,
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginView()));
+                        },
+                        child: CustomText(
+                          text: 'Logout',
+                          color: AppColors.primaryColor,
+                        ),
                       ),
                       Gap(10),
                       Icon(
