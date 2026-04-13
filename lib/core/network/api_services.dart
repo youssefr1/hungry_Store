@@ -24,7 +24,7 @@ Future<dynamic> get (String endpoints)async{
 
 
 // Put // Update
-Future<dynamic> put (String endpoints,Map<String,dynamic> body)async {
+Future<dynamic> put (String endpoints,dynamic body)async {
     try {
       final response = await _dioClient.dio.put(endpoints,data: body);
       return response.data;
@@ -37,7 +37,7 @@ Future<dynamic> put (String endpoints,Map<String,dynamic> body)async {
 
 
 //  post
-Future<dynamic> post (String endpoints,Map<String,dynamic> body)async {
+Future<dynamic> post (String endpoints,dynamic body)async {
     try {
       final response = await _dioClient.dio.post(
           endpoints, data: body);

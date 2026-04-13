@@ -26,6 +26,13 @@ class _LoginViewState extends State<LoginView> {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   AuthRepo authRepo = AuthRepo();
+  @override
+  void initState() {
+    super.initState();
+emailController.text ='youssef1122@gmail.com';
+passwordController.text ='123456789';
+
+  }
 
   Future<void> login() async {
     if (formKey.currentState!.validate()) {
