@@ -37,10 +37,13 @@ class CartItem extends StatelessWidget {
                     child: Image.asset('assets/icons/shadow.png',height: 45,)
                 ),
                 Center(
-                  child: Image.asset(
+                  child: Image.network(
                     image,
                     width: 120.w,
                     height: 120.h,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) =>
+                        const Icon(Icons.fastfood, size: 50, color: Colors.grey),
                   ),
                 ),
 

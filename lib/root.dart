@@ -1,7 +1,8 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:hungry_store/core/constants/app_colors.dart';
+import 'package:hungry_store/core/utils/pref_helper.dart';
+import 'package:hungry_store/shared/custom_dialog.dart';
+import 'package:hungry_store/shared/custom_animated_nav_bar.dart';
 
 import 'features/auth/views/profile_view.dart';
 import 'features/cart/views/cart_view.dart';
@@ -9,65 +10,67 @@ import 'features/home/views/home_view.dart';
 import 'features/orderHistory/views/order_history_view.dart';
 
 class Root extends StatefulWidget {
-   const Root({super.key});
+  const Root({super.key});
 
   @override
   State<Root> createState() => _RootState();
 }
 
 class _RootState extends State<Root> {
-  late PageController pageController ;
-   late List<Widget> screens;
-   int currentScreen = 0 ;
-   @override
+  late PageController pageController;
+  late List<Widget> screens;
+  int currentScreen = 0;
+
+  @override
   void initState() {
     screens = [
-      HomeView(),
-      CartView(),
-      OrderHistoryView(),
-      ProfileView(),
+      const HomeView(),
+      const CartView(),
+      const OrderHistoryView(),
+      const ProfileView(),
     ];
     pageController = PageController(initialPage: currentScreen);
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
-
     return PopScope(
       canPop: false,
       child: Scaffold(
+        extendBody: true, // Allow body to expand behind transparent nav bar
         bottomNavigationBar: FadeInUp(
-          duration: Duration(milliseconds: 500),
-          child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.primaryColor,
-              borderRadius: BorderRadius.circular(18.r)
-            ),
-            padding: EdgeInsets.all(10),
-            child: BottomNavigationBar(
-              elevation: 0,
-              backgroundColor: Colors.transparent,
-                type: BottomNavigationBarType.fixed,
-                items:[
-                  BottomNavigationBarItem(icon: Icon(Icons.home),label: 'Home'),
-                  BottomNavigationBarItem(icon: Icon(Icons.add_shopping_cart),label: 'Cart'),
-                  BottomNavigationBarItem(icon: Icon(Icons.local_dining_sharp),label: 'Order History'),
-                  BottomNavigationBarItem(icon: Icon(Icons.person),label: 'Profile'),
-                ] ,
-              selectedItemColor: Colors.white,
-              unselectedItemColor: Colors.grey.shade500.withOpacity(0.7),
-              currentIndex: currentScreen,
-              onTap:(index){
-                setState(() {
-                  currentScreen = index ;
-                });
-                pageController.jumpToPage(currentScreen);
-              } ,
-            ),
+          duration: const Duration(milliseconds: 600),
+          child: CustomAnimatedNavBar(
+            currentIndex: currentScreen,
+            onTap: (index) async {
+              if (index > 0) {
+                final token = await PrefHelper.getToken();
+                if (token == null) {
+                  if (mounted) {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const CustomDialog(type: DialogType.auth),
+                    );
+                  }
+                  return;
+                }
+              }
+              setState(() {
+                currentScreen = index;
+              });
+              pageController.jumpToPage(currentScreen);
+            },
+            items: [
+              CustomNavItem(icon: Icons.home_rounded, label: 'Home'),
+              CustomNavItem(icon: Icons.shopping_cart_rounded, label: 'Cart'),
+              CustomNavItem(icon: Icons.history_rounded, label: 'History'),
+              CustomNavItem(icon: Icons.person_rounded, label: 'Profile'),
+            ],
           ),
         ),
         body: PageView(
-          physics:NeverScrollableScrollPhysics() ,
+          physics: const NeverScrollableScrollPhysics(),
           controller: pageController,
           children: screens,
         ),

@@ -95,6 +95,9 @@ class AuthRepo {
   }
 
   // logout
+  Future<void> logout() async {
+    await PrefHelper.removeToken();
+  }
 
   //get profile
   Future<UserModel?> getProfile() async {
@@ -122,11 +125,11 @@ class AuthRepo {
         'name': name,
         'email': email,
         'address': address,
-        if(visa!=null&&visa.isNotEmpty) 'Visa': visa,
-        if(image!=null&&image.isNotEmpty) 'image':MultipartFile.fromFile(image,filename:'profile.jpg' ),
-
+        if (visa != null && visa.isNotEmpty) 'Visa': visa,
+        if (image != null && image.isNotEmpty)
+          'image': await MultipartFile.fromFile(image, filename: 'profile.jpg'),
       });
-      final response = await apiServices.put('/update-profile', formData);
+      final response = await apiServices.post('/update-profile', formData);
       if (response is ApiError) {
         throw response;
       }
@@ -138,12 +141,13 @@ class AuthRepo {
         if (code != 200 && code != 201) {
           throw ApiError(message: msg);
         }
-    } }on DioException catch (e) {
+        return UserModel.fromJson(response['data']);
+      }
+    } on DioException catch (e) {
       ApiExceptions.handleApiError(e);
     } catch (e) {
       throw ApiError(message: e.toString());
     }
     return null;
-
   }
 }

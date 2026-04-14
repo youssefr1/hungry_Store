@@ -5,7 +5,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:hungry_store/core/constants/app_colors.dart';
 import 'package:hungry_store/features/auth/views/login_view.dart';
-
 import '../../../core/network/api_error.dart';
 import '../../../root.dart';
 import '../../../shared/custom_auth_button.dart';
@@ -42,37 +41,37 @@ class _SignupViewState extends State<SignupView> {
           emailController.text.trim(),
           passwordController.text.trim(),
         );
-        Navigator.pop(context); // dismiss loading dialog
+        if (mounted) Navigator.pop(context); // dismiss loading dialog
         
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) => const CustomDialog(type: DialogType.success, message: 'Register successful'),
-        );
-          await Future.delayed(const Duration(seconds: 1));
+        if (mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) => const CustomDialog(type: DialogType.success, message: 'Register successful'),
+          );
+        }
+        await Future.delayed(const Duration(seconds: 1));
+        if (mounted) {
           Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return const Root();
-                },
-              ),
-            );
-
+            context,
+            MaterialPageRoute(builder: (context) => const Root()),
+          );
+        }
       } catch (e) {
-        Navigator.pop(context); // dismiss loading dialog
+        if (mounted) Navigator.pop(context); // dismiss loading dialog
         String errorMessage = 'unhandled error in register';
         if (e is ApiError) {
           errorMessage = e.message;
+        }
+        if (mounted) {
           showDialog(
             context: context,
             barrierDismissible: false,
             builder: (context) => CustomDialog(type: DialogType.error, message: errorMessage),
           );
-          await Future.delayed(const Duration(seconds: 2));
-          if (mounted) Navigator.pop(context);
         }
-
+        await Future.delayed(const Duration(seconds: 2));
+        if (mounted) Navigator.pop(context);
       }
     }
   }
@@ -81,141 +80,214 @@ class _SignupViewState extends State<SignupView> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
-      child: PopScope(
-        canPop: false,
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          body: Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 0.w),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Gap(100.h),
-                    FadeInDown(
-                      duration: Duration(milliseconds: 500),
-                      child: SvgPicture.asset(
-                        'assets/logo/logo.svg',
-                        color: AppColors.primaryColor,
-                        height: 70.h,
-                        width: 70.w,
-                      ),
-                    ),
-                    Gap(20.h),
-                    FadeInDown(
-                      duration: Duration(milliseconds: 600),
-                      child: CustomText(
-                        text: 'Create Account',
-                        color: Colors.black,
-                        weight: FontWeight.bold,
-                        size: 26.sp,
-                      ),
-                    ),
-                    Gap(5.h),
-                    FadeInDown(
-                      duration: Duration(milliseconds: 700),
-                      child: CustomText(
-                        text: 'Join Us and Enjoy Fast Food',
-                        color: Colors.grey.shade600,
-                        weight: FontWeight.w500,
-                        size: 14.sp,
-                      ),
-                    ),
-                    Gap(40.h),
-                    Expanded(
-                      child: FadeInUp(
-                        duration: Duration(milliseconds: 800),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 20.h),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryColor,
-                            borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(40.r),
-                              topLeft: Radius.circular(40.r),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Stack(
+          children: [
+            // Decorative Premium Background Elements
+            Positioned(
+              top: -80,
+              left: -100,
+              child: Opacity(
+                opacity: 0.03,
+                child: Transform.rotate(
+                  angle: 0.4,
+                  child: SvgPicture.asset(
+                    'assets/logo/logo.svg',
+                    height: 350.h,
+                    colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 40,
+              right: -60,
+              child: Opacity(
+                opacity: 0.04,
+                child: Container(
+                  width: 250.w,
+                  height: 250.h,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.primaryColor, width: 2),
+                  ),
+                ),
+              ),
+            ),
+            
+            SafeArea(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      children: [
+                        Gap(40.h),
+                        // Premium Logo Section (Floating with Border)
+                        FadeInDown(
+                          duration: const Duration(milliseconds: 800),
+                          child: Container(
+                            padding: EdgeInsets.all(20.w),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.grey.shade50, width: 4),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.06),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.primaryColor.withOpacity(0.3),
-                                blurRadius: 15,
-                                offset: Offset(0, -5),
-                              ),
-                            ],
+                            child: SvgPicture.asset(
+                              'assets/logo/logo.svg',
+                              colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+                              height: 55.h,
+                              width: 55.w,
+                            ),
                           ),
-                          child: SingleChildScrollView(
+                        ),
+                        Gap(30.h),
+                        SlideInLeft(
+                          duration: const Duration(milliseconds: 600),
+                          child: CustomText(
+                            text: 'Create Account',
+                            color: Colors.black87,
+                            weight: FontWeight.w800,
+                            size: 32.sp,
+                          ),
+                        ),
+                        Gap(8.h),
+                        SlideInRight(
+                          duration: const Duration(milliseconds: 600),
+                          child: CustomText(
+                            text: 'Join the community of food lovers',
+                            color: Colors.black54,
+                            weight: FontWeight.w500,
+                            size: 16.sp,
+                          ),
+                        ),
+                        Gap(40.h),
+                        
+                        // Premium Form (Multi-layered Shadow Green Card)
+                        FadeInUp(
+                          duration: const Duration(milliseconds: 1000),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor,
+                              borderRadius: BorderRadius.circular(30.r),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primaryColor.withOpacity(0.25),
+                                  blurRadius: 35,
+                                  offset: const Offset(0, 15),
+                                ),
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5),
+                                ),
+                              ],
+                            ),
                             child: Column(
                               children: [
-                                Gap(30.h),
-                                FadeInUp(
-                                  duration: Duration(milliseconds: 900),
-                                  child: CustomTextfeild(
-                                    hintText: 'Name',
-                                    isPassword: false,
-                                    controller: userNameController,
+                                Theme(
+                                  data: Theme.of(context).copyWith(
+                                    inputDecorationTheme: InputDecorationTheme(
+                                      fillColor: Colors.white.withOpacity(0.08),
+                                      filled: true,
+                                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 14.sp),
+                                      prefixIconColor: Colors.white70,
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(18.r),
+                                        borderSide: BorderSide(color: Colors.white.withOpacity(0.15), width: 1.5),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(18.r),
+                                        borderSide: const BorderSide(color: Colors.white, width: 2),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                Gap(20.h),
-                                FadeInUp(
-                                  duration: Duration(milliseconds: 1000),
-                                  child: CustomTextfeild(
-                                    hintText: 'Email Address',
-                                    isPassword: false,
-                                    controller: emailController,
-                                  ),
-                                ),
-                                Gap(20.h),
-                                FadeInUp(
-                                  duration: Duration(milliseconds: 1100),
-                                  child: CustomTextfeild(
-                                    hintText: 'Password',
-                                    isPassword: true,
-                                    controller: passwordController,
+                                  child: Column(
+                                    children: [
+                                      CustomTextfeild(
+                                        hintText: 'Full Name',
+                                        isPassword: false,
+                                        controller: userNameController,
+                                      ),
+                                      Gap(20.h),
+                                      CustomTextfeild(
+                                        hintText: 'Email Address',
+                                        isPassword: false,
+                                        controller: emailController,
+                                      ),
+                                      Gap(20.h),
+                                      CustomTextfeild(
+                                        hintText: 'Password',
+                                        isPassword: true,
+                                        controller: passwordController,
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 Gap(40.h),
-                                FadeInUp(
-                                  duration: Duration(milliseconds: 1200),
-                                  child: CustomAuthButton(
-                                    color: Colors.white,
-                                    textColor: AppColors.primaryColor,
-                                    onTap: SignUp,
-                                    text: 'Sign Up',
-                                  ),
+                                CustomAuthButton(
+                                  color: Colors.white,
+                                  textColor: AppColors.primaryColor,
+                                  onTap: SignUp,
+                                  text: 'Sign Up',
                                 ),
-                                Gap(20.h),
-                                FadeInUp(
-                                  duration: Duration(milliseconds: 1300),
-                                  child: CustomAuthButton(
-                                    textColor: Colors.white,
-                                    color: Colors.transparent,
-                                    onTap: () {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) {
-                                            return LoginView();
-                                          },
-                                        ),
-                                      );
-                                    },
-                                    text: 'Go to login',
-                                  ),
-                                ),
-                                Gap(20.h),
                               ],
                             ),
                           ),
                         ),
-                      ),
+                        
+                        Gap(40.h),
+                        FadeInUp(
+                          duration: const Duration(milliseconds: 1200),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CustomText(
+                                text: "Already have an account? ",
+                                color: Colors.black54,
+                                size: 15.sp,
+                                weight: FontWeight.w500,
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const LoginView()),
+                                  );
+                                },
+                                child: CustomText(
+                                  text: 'Login',
+                                  color: AppColors.primaryColor,
+                                  weight: FontWeight.w800,
+                                  size: 16.sp,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Gap(40.h),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );
   }
 }
+
+

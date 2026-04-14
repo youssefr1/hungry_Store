@@ -29,9 +29,6 @@ class _LoginViewState extends State<LoginView> {
   @override
   void initState() {
     super.initState();
-emailController.text ='youssef1122@gmail.com';
-passwordController.text ='123456789';
-
   }
 
   Future<void> login() async {
@@ -56,28 +53,28 @@ passwordController.text ='123456789';
               message: 'Login successful',
             ),
           );
-          await Future.delayed(Duration(seconds: 1));
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return Root();
-              },
-            ),
-          );
+          await Future.delayed(const Duration(seconds: 1));
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const Root()),
+            );
+          }
         }
       } catch (e) {
-        Navigator.pop(context); // dismiss loading dialog
+        if (mounted) Navigator.pop(context); // dismiss loading dialog
         String errorMessage = 'unhandled error in login';
         if (e is ApiError) {
           errorMessage = e.message;
         }
-        showDialog(
-          context: context,
-          barrierDismissible: false,
-          builder: (context) =>
-              CustomDialog(type: DialogType.error, message: errorMessage),
-        );
+        if (mounted) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (context) =>
+                CustomDialog(type: DialogType.error, message: errorMessage),
+          );
+        }
         await Future.delayed(const Duration(seconds: 2));
         if (mounted) Navigator.pop(context);
       }
@@ -88,153 +85,238 @@ passwordController.text ='123456789';
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
-      child: PopScope(
-        canPop: false,
-        child: Scaffold(
-          backgroundColor: Colors.white,
-          body: Center(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 0.w),
-              child: Form(
-                key: formKey,
-                child: Column(
-                  children: [
-                    Gap(140.h),
-                    FadeInDown(
-                      duration: Duration(milliseconds: 500),
-                      child: SvgPicture.asset(
-                        'assets/logo/logo.svg',
-                        color: AppColors.primaryColor,
-                        height: 70.h,
-                        width: 70.w,
-                      ),
-                    ),
-                    Gap(20.h),
-                    FadeInDown(
-                      duration: Duration(milliseconds: 600),
-                      child: CustomText(
-                        text: 'Welcome Back!',
-                        color: Colors.black,
-                        weight: FontWeight.bold,
-                        size: 26.sp,
-                      ),
-                    ),
-                    Gap(5.h),
-                    FadeInDown(
-                      duration: Duration(milliseconds: 700),
-                      child: CustomText(
-                        text: 'Discover The Best Fast Food',
-                        color: Colors.grey.shade600,
-                        weight: FontWeight.w500,
-                        size: 14.sp,
-                      ),
-                    ),
-                    Gap(80.h),
-                    Expanded(
-                      child: FadeInUp(
-                        duration: Duration(milliseconds: 800),
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 30.w,
-                            vertical: 20.h,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.primaryColor,
-                            borderRadius: BorderRadius.only(
-                              topRight: Radius.circular(40.r),
-                              topLeft: Radius.circular(40.r),
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: Stack(
+          children: [
+            // Decorative Premium Background Elements
+            Positioned(
+              top: -100,
+              right: -100,
+              child: Opacity(
+                opacity: 0.03,
+                child: Transform.rotate(
+                  angle: -0.2,
+                  child: SvgPicture.asset(
+                    'assets/logo/logo.svg',
+                    height: 400.h,
+                    colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: -50,
+              left: -80,
+              child: Opacity(
+                opacity: 0.04,
+                child: Container(
+                  width: 300.w,
+                  height: 300.h,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.primaryColor, width: 2),
+                  ),
+                ),
+              ),
+            ),
+            
+            SafeArea(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24.w),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      children: [
+                        Gap(60.h),
+                        // Premium Logo Section (Floating with Border)
+                        FadeInDown(
+                          duration: const Duration(milliseconds: 800),
+                          child: Container(
+                            padding: EdgeInsets.all(20.w),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.grey.shade50, width: 4),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.06),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 10),
+                                ),
+                              ],
                             ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppColors.primaryColor.withOpacity(0.3),
-                                blurRadius: 15,
-                                offset: Offset(0, -5),
-                              ),
-                            ],
+                            child: SvgPicture.asset(
+                              'assets/logo/logo.svg',
+                              colorFilter: ColorFilter.mode(AppColors.primaryColor, BlendMode.srcIn),
+                              height: 55.h,
+                              width: 55.w,
+                            ),
                           ),
-                          child: SingleChildScrollView(
+                        ),
+                        Gap(30.h),
+                        SlideInLeft(
+                          duration: const Duration(milliseconds: 600),
+                          child: CustomText(
+                            text: 'Welcome Back',
+                            color: Colors.black87,
+                            weight: FontWeight.w800,
+                            size: 32.sp,
+                          ),
+                        ),
+                        Gap(8.h),
+                        SlideInRight(
+                          duration: const Duration(milliseconds: 600),
+                          child: CustomText(
+                            text: 'Login to continue your flavor journey',
+                            color: Colors.black54,
+                            weight: FontWeight.w500,
+                            size: 16.sp,
+                          ),
+                        ),
+                        Gap(50.h),
+                        
+                        // Premium Form (Multi-layered Shadow Green Card)
+                        FadeInUp(
+                          duration: const Duration(milliseconds: 1000),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 40.h),
+                            decoration: BoxDecoration(
+                              color: AppColors.primaryColor,
+                              borderRadius: BorderRadius.circular(30.r),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primaryColor.withOpacity(0.25),
+                                  blurRadius: 35,
+                                  offset: const Offset(0, 15),
+                                ),
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  blurRadius: 10,
+                                  offset: const Offset(0, 5),
+                                ),
+                              ],
+                            ),
                             child: Column(
                               children: [
-                                Gap(40.h),
-                                FadeInUp(
-                                  duration: Duration(milliseconds: 900),
-                                  child: CustomTextfeild(
-                                    hintText: 'Email Address',
-                                    isPassword: false,
-                                    controller: emailController,
+                                Theme(
+                                  data: Theme.of(context).copyWith(
+                                    inputDecorationTheme: InputDecorationTheme(
+                                      fillColor: Colors.white.withOpacity(0.08),
+                                      filled: true,
+                                      hintStyle: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 14.sp),
+                                      prefixIconColor: Colors.white70,
+                                      enabledBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(18.r),
+                                        borderSide: BorderSide(color: Colors.white.withOpacity(0.15), width: 1.5),
+                                      ),
+                                      focusedBorder: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(18.r),
+                                        borderSide: const BorderSide(color: Colors.white, width: 2),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                Gap(20.h),
-                                FadeInUp(
-                                  duration: Duration(milliseconds: 1000),
-                                  child: CustomTextfeild(
-                                    hintText: 'Password',
-                                    isPassword: true,
-                                    controller: passwordController,
-                                  ),
-                                ),
-                                Gap(40.h),
-                                FadeInUp(
-                                  duration: Duration(milliseconds: 1100),
-                                  child: CustomAuthButton(
-                                    color: Colors.white,
-                                    textColor: AppColors.primaryColor,
-                                    onTap: login,
-                                    text: 'Login',
-                                  ),
-                                ),
-                                Gap(20.h),
-                                FadeInUp(
-                                  duration: Duration(milliseconds: 1200),
-                                  child: CustomAuthButton(
-                                    color: Colors.transparent,
-                                    textColor: Colors.white,
-                                    onTap: () {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) {
-                                            return SignupView();
-                                          },
-                                        ),
-                                      );
-                                    },
-                                    text: 'Create Account',
+                                  child: Column(
+                                    children: [
+                                      CustomTextfeild(
+                                        hintText: 'Email Address',
+                                        isPassword: false,
+                                        controller: emailController,
+                                      ),
+                                      Gap(20.h),
+                                      CustomTextfeild(
+                                        hintText: 'Password',
+                                        isPassword: true,
+                                        controller: passwordController,
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 Gap(10.h),
-                                FadeInUp(
-                                  duration: Duration(milliseconds: 1300),
+                                Align(
+                                  alignment: Alignment.centerRight,
                                   child: TextButton(
-                                    onPressed: () {
-                                      Navigator.pushReplacement(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) {
-                                            return Root();
-                                          },
-                                        ),
-                                      );
-                                    },
+                                    onPressed: () {},
+                                    style: TextButton.styleFrom(
+                                      visualDensity: VisualDensity.compact,
+                                    ),
                                     child: CustomText(
-                                      text: 'Continue as guest',
-                                      color: Colors.white70,
-                                      size: 15.sp,
+                                      text: 'Forgot Password?',
+                                      color: Colors.white.withOpacity(0.7),
+                                      size: 14.sp,
                                       weight: FontWeight.w600,
                                     ),
                                   ),
+                                ),
+                                Gap(30.h),
+                                CustomAuthButton(
+                                  color: Colors.white,
+                                  textColor: AppColors.primaryColor,
+                                  onTap: login,
+                                  text: 'Login',
                                 ),
                               ],
                             ),
                           ),
                         ),
-                      ),
+                        
+                        Gap(40.h),
+                        FadeInUp(
+                          duration: const Duration(milliseconds: 1200),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CustomText(
+                                text: "Don't have an account? ",
+                                color: Colors.black54,
+                                size: 15.sp,
+                                weight: FontWeight.w500,
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const SignupView()),
+                                  );
+                                },
+                                child: CustomText(
+                                  text: 'Sign Up',
+                                  color: AppColors.primaryColor,
+                                  weight: FontWeight.w800,
+                                  size: 16.sp,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Gap(20.h),
+                        FadeInUp(
+                          duration: const Duration(milliseconds: 1400),
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => const Root()),
+                              );
+                            },
+                            child: CustomText(
+                              text: 'Continue as guest',
+                              color: Colors.black38,
+                              size: 15.sp,
+                              weight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
+                        Gap(40.h),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
       ),
     );

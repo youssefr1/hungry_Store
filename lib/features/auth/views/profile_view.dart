@@ -8,10 +8,11 @@ import 'package:hungry_store/core/constants/app_colors.dart';
 import 'package:hungry_store/features/auth/data/auth_repo.dart';
 import 'package:hungry_store/features/auth/data/user_model.dart';
 import 'package:hungry_store/features/auth/views/login_view.dart';
-import 'package:hungry_store/shared/custom_button.dart';
+import 'package:hungry_store/shared/custom_dialog.dart';
 import 'package:hungry_store/shared/custom_snakbar_error.dart';
 import 'package:hungry_store/shared/custom_text.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:hungry_store/shared/custom_loading.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import '../../../core/network/api_error.dart';
@@ -31,16 +32,16 @@ class _ProfileViewState extends State<ProfileView> {
   final TextEditingController _visa = TextEditingController();
   AuthRepo authRepo = AuthRepo();
   UserModel? userModel;
+  bool isUpdating = false;
 
   Future<void> getProfile() async {
     try {
       final user = await authRepo.getProfile();
       setState(() {
         userModel = user;
-        _name.text =
-            userModel?.name.toString() ?? 'Kuncles';
-        _email.text = userModel?.email.toString() ??
-            'Kuncles@gmail.com';
+        selectedImage = null; // Clear local selection to show remote image
+        _name.text = userModel?.name.toString() ?? 'Kuncles';
+        _email.text = userModel?.email.toString() ?? 'Kuncles@gmail.com';
         _address.text = userModel?.address ?? 'cairo';
         _visa.text = userModel?.visa?.toString() ?? '';
       });
@@ -48,10 +49,9 @@ class _ProfileViewState extends State<ProfileView> {
       String errorMessage = 'unhandled error in Profile';
       if (e is ApiError) {
         errorMessage = e.message;
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(CustomSnakBar(
-            errorMessage: errorMessage) as SnackBar);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(CustomSnakBar(errorMessage: errorMessage));
       }
     }
   }
@@ -60,15 +60,21 @@ class _ProfileViewState extends State<ProfileView> {
 
   Future<void> pickphoto() async {
     final Pickedimage = await ImagePicker().pickImage(
-        source: ImageSource.gallery);
+      source: ImageSource.gallery,
+    );
     if (Pickedimage != null) {
       setState(() {
         selectedImage = Pickedimage.path;
       });
+      // Automatically upload the image to the backend
+      await updateProfile();
     }
   }
 
   Future<void> updateProfile() async {
+    setState(() {
+      isUpdating = true;
+    });
     try {
       final user = await authRepo.updateProfile(
         name: _name.text.trim(),
@@ -79,16 +85,47 @@ class _ProfileViewState extends State<ProfileView> {
       );
       setState(() {
         userModel = user;
+        selectedImage = null; // Clear local selection to show remote image
+        isUpdating = false;
       });
-    } catch (e) {
-      String errmessage = 'Failed to load image';
-      if (e is ApiError) errmessage = e.message;
       ScaffoldMessenger.of(context).showSnackBar(
-          CustomSnakBar(
-              errorMessage: errmessage) as SnackBar );
+        SnackBar(
+          content: Text('Profile updated successfully!'),
+          backgroundColor: Colors.green,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+    } catch (e) {
+      setState(() {
+        isUpdating = false;
+      });
+      String errmessage = 'Failed to update profile';
+      if (e is ApiError) errmessage = e.message;
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(CustomSnakBar(errorMessage: errmessage));
     }
   }
 
+  Future<void> logout() async {
+    showDialog(
+      context: context,
+      builder: (context) => CustomDialog(
+        type: DialogType.logout,
+        onConfirm: () async {
+          Navigator.pop(context); // close dialog
+          await authRepo.logout();
+          if (mounted) {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const LoginView()),
+              (route) => false,
+            );
+          }
+        },
+      ),
+    );
+  }
 
   @override
   void initState() {
@@ -99,244 +136,291 @@ class _ProfileViewState extends State<ProfileView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.primaryColor,
-      appBar: AppBar(
-        leading: Icon(null),
-        scrolledUnderElevation: 0.0,
-        backgroundColor: Colors.transparent,
-        actions: [
-          FadeInDown(
-            duration: Duration(milliseconds: 400),
-            child: Image.asset(
-              'assets/icons/settings.png',
-              color: Colors.white,
-              width: 24.w,
-            ),
-          ),
-          Gap(15),
-        ],
-      ),
-      body: RefreshIndicator(
-        color: AppColors.primaryColor,
-        onRefresh: () async {
-          await getProfile();
-        },
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            child: Skeletonizer(
-              enabled: userModel == null,
-              child: Column(
-                children: [
-                  FadeInDown(
-                    duration: Duration(milliseconds: 500),
-                    child: Center(
-                      child: Container(
-                          width: 120,
-                          height: 120,
-                          decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(width: 2,
-                                  color: Colors.white),
-                              color: Colors.grey,
-                              image: DecorationImage(
-                                fit: BoxFit.cover,
-                                image: FileImage(File(
-                                    selectedImage ?? "")),
-                              )
-
-                          ),
-                          clipBehavior: Clip.antiAlias,
-                          child: selectedImage != null
-                              ? Image.file(File(
-                              selectedImage!),fit: BoxFit.cover,)
-                              : (userModel?.image != null &&
-                              userModel!.image!.isNotEmpty)
-                              ? Image.network(userModel!
-                              .image!,fit:BoxFit.cover,
-                              errorBuilder: (context, err,
-                                  builder) =>
-                                  Icon(Icons.person))
-                              :Icon(Icons.person)
-                      ),
-
-                    ),
-                  ),
-                  Gap(20),
-                  CustomButton(height: 35,
-                    width: 140,
-                    text: 'Upload Photo',
-                    onTap: pickphoto
-                    ,
-                    color: Colors.white
-                    ,
-                    textColor: AppColors.primaryColor
-                    ,),
-                  Gap(20),
-                  FadeInUp(
-                    duration: Duration(milliseconds: 600),
-                    child: CustomUserTxtfeild(
-                        controller: _name, lable: 'Name'),
-                  ),
-                  Gap(25),
-                  FadeInUp(
-                    duration: Duration(milliseconds: 700),
-                    child: CustomUserTxtfeild(
-                        controller: _email, lable: 'Email'),
-                  ),
-                  Gap(25),
-                  FadeInUp(
-                    duration: Duration(milliseconds: 800),
-                    child: CustomUserTxtfeild(
-                      controller: _address,
-                      lable: 'Address',
-                    ),
-                  ),
-                  Gap(15),
-                  FadeInUp(
-                    duration: Duration(milliseconds: 900),
-                    child: Divider(color: Colors.white54),
-                  ),
-                  Gap(25),
-                  userModel?.visa == null ?
-                  FadeInUp(
-                    duration: Duration(milliseconds: 800),
-                    child: CustomUserTxtfeild(
-                      controller: _visa,
-                      keyboardType: TextInputType.number,
-                      lable: 'Add Visa Card',
-                    ),
-                  ) :
-                  FadeInUp(
-                    duration: Duration(milliseconds: 1000),
-                    child: Material(
-                      color: Color(0xffF3F4F6),
-                      borderRadius: BorderRadius.circular(
-                          8),
-                      child: ListTile(
-                        onTap: () {},
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius
-                              .circular(8),
-                        ),
-                        tileColor: Color(0xffF3F4F6),
-                        selectedTileColor: Color(
-                            0xffF3F4F6),
-                        hoverColor: Color(0xffF3F4F6),
-                        focusColor: Color(0xffF3F4F6),
-                        splashColor: Colors.transparent,
-
-                        subtitle: Text(
-                          userModel?.visa.toString() ??
-                              "3685 **** **** 5455",
-                          style: TextStyle(
-                              color: Colors.black),
-                        ),
-                        contentPadding: EdgeInsets
-                            .symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        title: Text(
-                          'Debit card',
-                          style: TextStyle(fontSize: 17,
-                              color: Colors.black),
-                        ),
-                        leading: Image.asset(
-                          'assets/icons/image 13.png',
-                          width: 83,
-                        ),
-                        trailing: CustomText(
-                          text: 'Default',
-                          color: Colors.black,
-                          size: 15.sp,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Gap(150),
-
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-      bottomSheet: FadeInUp(
-        duration: Duration(milliseconds: 1100),
-        child: Container(
-          height: 100.h,
-          decoration: BoxDecoration(),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment
-                  .spaceAround,
-              children: [
-                GestureDetector(
-                  onTap: updateProfile,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: 25, vertical: 15),
-                    decoration: BoxDecoration(
-                      color: AppColors.primaryColor,
-                      borderRadius: BorderRadius.circular(
-                          8),
-                    ),
-                    child: Row(
-                      children: [
-                        CustomText(
-                          text: 'Edit profile',
-                          color: Colors.white,
-                        ),
-                        Gap(10),
-                        Icon(Icons.edit,
-                            color: Colors.white),
-                      ],
-                    ),
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: 25, vertical: 15),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                        color: AppColors.primaryColor),
-                  ),
-                  child: Row(
+      backgroundColor: const Color(0xffF8F9FB),
+      body: CustomScrollView(
+        slivers: [
+          // Premium Header
+          SliverAppBar(
+            expandedHeight: 220.h,
+            pinned: true,
+            elevation: 0,
+            backgroundColor: AppColors.primaryColor,
+            automaticallyImplyLeading: false,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Container(
+                color: AppColors.primaryColor,
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  LoginView(),
+                      Gap(40.h),
+                      FadeInDown(
+                        duration: const Duration(milliseconds: 500),
+                        child: Stack(
+                          children: [
+                            Container(
+                              width: 110.w,
+                              height: 110.w,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 3),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: _buildProfileImage(),
                             ),
-                          );
-                        },
-                        child: CustomText(
-                          text: 'Logout',
-                          color: AppColors.primaryColor,
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: GestureDetector(
+                                onTap: pickphoto,
+                                child: Container(
+                                  padding: EdgeInsets.all(8.w),
+                                  decoration: const BoxDecoration(
+                                    color: Colors.white,
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    Icons.camera_alt_rounded,
+                                    color: AppColors.primaryColor,
+                                    size: 20.w,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      Gap(10),
-                      Icon(
-                        Icons.exit_to_app_outlined,
-                        color: AppColors.primaryColor,
+                      Gap(10.h),
+                      FadeInUp(
+                        duration: const Duration(milliseconds: 600),
+                        child: CustomText(
+                          text: userModel?.name ?? 'Hungry User',
+                          color: Colors.white,
+                          weight: FontWeight.bold,
+                          size: 18.sp,
+                        ),
                       ),
                     ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+
+          // Content
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.all(20.w),
+              child: Column(
+                children: [
+                  FadeInUp(
+                    duration: const Duration(milliseconds: 700),
+                    child: Container(
+                      padding: EdgeInsets.all(10.w),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(20.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.03),
+                            blurRadius: 15,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Skeletonizer(
+                        enabled: userModel == null,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildInfoSection(
+                              title: 'Personal Information',
+                              children: [
+                                CustomUserTxtfeild(
+                                  controller: _name,
+                                  lable: 'Full Name',
+                                  textColor: Colors.black87,
+                                  labelColor: Colors.grey,
+                                  borderColor: Colors.grey.shade300,
+                                ),
+                                Gap(15.h),
+                                CustomUserTxtfeild(
+                                  controller: _email,
+                                  lable: 'Email Address',
+                                  textColor: Colors.black87,
+                                  labelColor: Colors.grey,
+                                  borderColor: Colors.grey.shade300,
+                                ),
+                                Gap(15.h),
+                                CustomUserTxtfeild(
+                                  controller: _address,
+                                  lable: 'Delivery Address',
+                                  textColor: Colors.black87,
+                                  labelColor: Colors.grey,
+                                  borderColor: Colors.grey.shade300,
+                                ),
+                              ],
+                            ),
+                            Gap(25.h),
+                            _buildInfoSection(
+                              title: 'Payment Methods',
+                              children: [
+                                userModel?.visa == null
+                                    ? CustomUserTxtfeild(
+                                        controller: _visa,
+                                        keyboardType: TextInputType.number,
+                                        lable: 'Link Visa Card',
+                                        textColor: Colors.black87,
+                                        labelColor: Colors.grey,
+                                        borderColor: Colors.grey.shade300,
+                                      )
+                                    : Container(
+                                        padding: EdgeInsets.all(15.w),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.shade50,
+                                          borderRadius: BorderRadius.circular(15.r),
+                                          border: Border.all(color: Colors.grey.shade200),
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Image.asset('assets/icons/image 13.png', width: 40.w),
+                                            Gap(15.w),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                children: [
+                                                  CustomText(text: 'Debit Card', size: 14.sp, weight: FontWeight.w600),
+                                                  CustomText(
+                                                    text: userModel?.visa.toString() ?? "**** **** **** ****",
+                                                    size: 12.sp,
+                                                    color: Colors.grey,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            const Icon(Icons.check_circle, color: Colors.green),
+                                          ],
+                                        ),
+                                      ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Gap(30.h),
+                  
+                  // Action Buttons
+                  FadeInUp(
+                    duration: const Duration(milliseconds: 800),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          flex: 2,
+                          child: GestureDetector(
+                            onTap: updateProfile,
+                            child: Container(
+                              height: 55.h,
+                              decoration: BoxDecoration(
+                                color: AppColors.primaryColor,
+                                borderRadius: BorderRadius.circular(15.r),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: AppColors.primaryColor.withOpacity(0.35),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 5),
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: isUpdating
+                                    ? const CustomLoading(
+                                        color: Colors.white,
+                                        size: 20,
+                                        centered: false,
+                                      )
+                                    : Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          const Icon(Icons.check_circle_outline, color: Colors.white),
+                                          Gap(10.w),
+                                          CustomText(text: 'Save Changes', color: Colors.white, weight: FontWeight.bold),
+                                        ],
+                                      ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Gap(15.w),
+                        Expanded(
+                          flex: 1,
+                          child: GestureDetector(
+                            onTap: logout,
+                            child: Container(
+                              height: 55.h,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(15.r),
+                                border: Border.all(color: Colors.red.shade200),
+                              ),
+                              child: const Center(
+                                child: Icon(Icons.logout_rounded, color: Colors.red),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Gap(120.h), // Extra space for floating nav bar
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
+    );
+  }
+
+  Widget _buildProfileImage() {
+    if (selectedImage != null) {
+      return Image.file(File(selectedImage!), fit: BoxFit.cover);
+    }
+    if (userModel?.image != null && userModel!.image!.isNotEmpty) {
+      return Image.network(
+        userModel!.image!,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return const CustomLoading(size: 20);
+        },
+        errorBuilder: (context, err, builder) => const Icon(Icons.person, size: 50, color: Colors.grey),
+      );
+    }
+    return const Icon(Icons.person, size: 50, color: Colors.grey);
+  }
+
+  Widget _buildInfoSection({required String title, required List<Widget> children}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        CustomText(
+          text: title,
+          size: 16.sp,
+          weight: FontWeight.bold,
+          color: AppColors.primaryColor,
+        ),
+        Gap(15.h),
+        ...children,
+      ],
     );
   }
 }

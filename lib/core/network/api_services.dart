@@ -15,7 +15,7 @@ Future<dynamic> get (String endpoints)async{
       final response = await _dioClient.dio.get(endpoints);
       return response.data;
     } on DioException catch (e) {
-      return ApiExceptions.handleApiError(e);
+      throw ApiExceptions.handleApiError(e);
     }
 
 
@@ -29,7 +29,7 @@ Future<dynamic> put (String endpoints,dynamic body)async {
       final response = await _dioClient.dio.put(endpoints,data: body);
       return response.data;
     } on DioException catch (e) {
-      return ApiExceptions.handleApiError(e);
+      throw ApiExceptions.handleApiError(e);
     }
 
 }
@@ -43,7 +43,7 @@ Future<dynamic> post (String endpoints,dynamic body)async {
           endpoints, data: body);
       return response.data;
     }on DioException catch (e) {
-      return ApiExceptions.handleApiError(e);
+      throw ApiExceptions.handleApiError(e);
     }
 }
 
@@ -55,7 +55,7 @@ Future<dynamic> delete (String endpoints)async {
       final response = await _dioClient.dio.delete(endpoints);
       return response.data;
     } on DioException catch (e) {
-      return ApiExceptions.handleApiError(e);
+      throw ApiExceptions.handleApiError(e);
     }
 }
 

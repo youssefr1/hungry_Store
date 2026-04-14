@@ -7,8 +7,14 @@ import 'package:hungry_store/shared/custom_text.dart';
 
 import '../../../shared/custom_button.dart';
 
+import 'package:hungry_store/features/cart/data/cart_model.dart';
+import 'package:hungry_store/features/checkout/data/order_repo.dart';
+import 'package:hungry_store/core/network/api_error.dart';
+
 class CheckoutView extends StatefulWidget {
-  const CheckoutView({super.key});
+  final List<CartModel> cartItems;
+  final double totalPrice;
+  const CheckoutView({super.key, required this.cartItems, required this.totalPrice});
 
   @override
   State<CheckoutView> createState() => _CheckoutViewState();
@@ -16,6 +22,70 @@ class CheckoutView extends StatefulWidget {
 
 class _CheckoutViewState extends State<CheckoutView> {
   String selectedMethod = 'Cash';
+  bool _isProcessing = false;
+  final OrderRepo _orderRepo = OrderRepo();
+
+  Future<void> _handlePayment() async {
+    setState(() => _isProcessing = true);
+    try {
+      await _orderRepo.placeOrder(widget.cartItems);
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+              backgroundColor: Colors.transparent,
+              child: Container(
+                height: 300,
+                padding: EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: AppColors.primaryColor,
+                      radius: 35,
+                      child: Icon(Icons.check, color: Colors.white, size: 40),
+                    ),
+                    Gap(16),
+                    CustomText(text: 'Success', color: AppColors.primaryColor, size: 24, weight: FontWeight.bold),
+                    Gap(8),
+                    CustomText(
+                      text: 'Order placed successfully!\nYour meal is being prepared.',
+                      size: 14,
+                      color: Colors.grey,
+                      textAlign: TextAlign.center,
+                    ),
+                    Spacer(),
+                    CustomButton(
+                      text: 'Back to Home',
+                      onTap: () {
+                        Navigator.of(context).popUntil((route) => route.isFirst);
+                      },
+                    )
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e is ApiError ? e.message : 'Order failed. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isProcessing = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,10 +121,10 @@ class _CheckoutViewState extends State<CheckoutView> {
               FadeInDown(
                 duration: Duration(milliseconds: 500),
                 child: OrderDetails(
-                  order: '18.8',
-                  taxes: '1',
-                  delivery: '2',
-                  total: '20',
+                  order: widget.totalPrice.toStringAsFixed(2),
+                  taxes: '0.00',
+                  delivery: 'Free',
+                  total: widget.totalPrice.toStringAsFixed(2),
                 ),
               ),
               Gap(80),
@@ -108,50 +178,7 @@ class _CheckoutViewState extends State<CheckoutView> {
 
               Gap(20),
               // Debit card
-              FadeInUp(
-                duration: Duration(milliseconds: 800),
-                child: ListTile(
-                  onTap: () {
-                    setState(() {
-                      selectedMethod = 'Visa';
-                    });
-                  },
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  tileColor: Colors.blue.shade900,
-                  textColor: Colors.white,
-                  subtitle: Text(
-                    '3685 **** **** 5455',
-                    style: TextStyle(
-                      color: Colors.grey.shade500,
-                    ),
-                  ),
-                  contentPadding: EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  title: Text(
-                    'Debit card',
-                    style: TextStyle(fontSize: 17),
-                  ),
-                  leading: Image.asset(
-                    'assets/icons/image 13.png',
-                    width: 83,
-                    color: Colors.white,
-                  ),
-                  trailing: Radio<String>(
-                    activeColor: Colors.white,
-                    value: 'Visa',
-                    groupValue: selectedMethod,
-                    onChanged: (c) {
-                      setState(() {
-                        selectedMethod = c!;
-                      });
-                    },
-                  ),
-                ),
-              ),
+
               Gap(5),
               FadeInUp(
                 duration: Duration(milliseconds: 900),
@@ -212,69 +239,15 @@ class _CheckoutViewState extends State<CheckoutView> {
                   ),
                   Gap(5),
                   CustomText(
-                    text: '18.19 \$',
+                    text: '${widget.totalPrice.toStringAsFixed(2)} \$',
                     size: 24,
                     weight: FontWeight.w600,
                   ),
                 ],
               ),
               CustomButton(
-                text: 'Pay now',
-
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return Dialog(
-                        backgroundColor: Colors.transparent,
-                        child: Padding(
-                          padding:
-                              const EdgeInsets.symmetric(
-                                vertical: 200,
-                              ),
-                          child: Container(
-                            height: 300,
-                            padding: EdgeInsets.only(top: 10,right: 10,left: 10,bottom: 15),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius:
-                                  BorderRadius.circular(30),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey,
-                                  offset: Offset(0, 0),
-                                  blurRadius: 10,
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: AppColors
-                                      .primaryColor,
-                                  radius: 40,
-                                  child: Icon(
-                                    Icons.check,
-                                    color: Colors.white,
-                                    size: 40,
-                                  ),
-                                ),
-                                Gap(10),
-                                CustomText(text: 'Success ',color: AppColors.primaryColor,size: 25,),
-                                CustomText(text: 'Your payment was successful.\nA receipt for this purchase has \nbeen sent to your email. ',size: 14,color: Colors.grey,),
-                                  Spacer(),
-                                CustomButton(text: 'Close',width: 220, onTap: (){
-                                  Navigator.pop(context);
-                                })
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                },
+                text: _isProcessing ? 'Processing...' : 'Pay now',
+                onTap: _isProcessing ? () {} : () => _handlePayment(),
               ),
             ],
           ),
